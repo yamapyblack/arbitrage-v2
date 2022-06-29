@@ -11,4 +11,13 @@ interface INFTXMarketplaceZap {
     address to
   ) external payable;
 
+  function buyAndRedeemWETH(
+    uint256 vaultId, 
+    uint256 amount,
+    uint256[] calldata specificIds, 
+    uint256 maxWethIn, 
+    address[] calldata path,
+    address to
+  ) external;
+
 }

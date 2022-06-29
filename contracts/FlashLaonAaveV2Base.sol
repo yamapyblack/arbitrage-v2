@@ -5,25 +5,12 @@ import { FlashLoanReceiverBase } from "./aave/FlashLoanReceiverBase.sol";
 import { ILendingPool, ILendingPoolAddressesProvider } from "./aave/Interfaces.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import {ILogic} from "./interfaces/ILogic.sol";
 import "./lib/Withdrawable.sol";
-import "hardhat/console.sol";
+import "./lib/ERC721Receiver.sol";
 
-/** 
-    !!!
-    Never keep funds permanently on your FlashLoanReceiverBase contract as they could be 
-    exposed to a 'griefing' attack, where the stored funds are used by an attacker.
-    !!!
- */
-contract MyV2FlashLoanV2 is FlashLoanReceiverBase, Ownable, Pausable, Withdrawable {
+abstract contract FlashLaonAaveV2Base is FlashLoanReceiverBase, Ownable, Pausable, Withdrawable, ERC721Receiver {
 
-    address logic;
-
-    constructor(ILendingPoolAddressesProvider _addressProvider) FlashLoanReceiverBase(_addressProvider) {
-    }
-
-    function setLogic(address _logic) external onlyOwner {
-        logic = _logic;
+    constructor(address _addressProvider) FlashLoanReceiverBase(ILendingPoolAddressesProvider(_addressProvider)) {
     }
 
     function pause() external onlyOwner {
@@ -34,9 +21,15 @@ contract MyV2FlashLoanV2 is FlashLoanReceiverBase, Ownable, Pausable, Withdrawab
         _unpause();
     }
 
-    /**
-        This function is called after your contract has received the flash loaned amount
-     */
+    function _executeOperation(
+        address[] calldata assets,
+        uint256[] calldata amounts,
+        uint256[] calldata premiums,
+        address initiator,
+        bytes calldata params
+    ) internal virtual
+    {}
+
     function executeOperation(
         address[] calldata assets,
         uint256[] calldata amounts,
@@ -49,8 +42,7 @@ contract MyV2FlashLoanV2 is FlashLoanReceiverBase, Ownable, Pausable, Withdrawab
         override
         returns (bool)
     {
-        bool res = ILogic(logic).executeLogic(params);
-        require(res, "executeLogic failed.");
+        _executeOperation(assets,amounts,premiums,initiator,params);
 
         // Approve the LendingPool contract allowance to *pull* the owed amount
         for (uint i = 0; i < assets.length; i++) {

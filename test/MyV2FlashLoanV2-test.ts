@@ -3,10 +3,11 @@ import { ethers, network } from 'hardhat'
 import { expect, use } from 'chai'
 import { BigNumberish, BytesLike, PayableOverrides, utils, ContractTransaction, BigNumber } from "ethers"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address"
+import { encodeParameters } from "../scripts/common"
 
 let owner:SignerWithAddress, addr1:SignerWithAddress, addr2:SignerWithAddress
 
-import { MyV2FlashLoanV2, IWETH, Logic } from "../typechain-types/index"
+import { MyV2FlashLoanV2, IWETH, LogicMock } from "../typechain-types/index"
 
 // kovan
 // const wethAddr = "0xd0A1E359811322d97991E03f863a0C30C2cF029C"
@@ -18,7 +19,7 @@ const AddressPrivider = "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"
 
 describe("testing for ", async () => {
     let contract: MyV2FlashLoanV2
-    let contract2: Logic
+    let contract2: LogicMock
     let weth: IWETH
 
     beforeEach(async () => {
@@ -28,8 +29,8 @@ describe("testing for ", async () => {
         contract = (await C1.deploy(AddressPrivider)) as MyV2FlashLoanV2
         await contract.deployed()
 
-        const C2 = await ethers.getContractFactory("Logic")
-        contract2 = (await C2.deploy(contract.address)) as Logic
+        const C2 = await ethers.getContractFactory("LogicMock")
+        contract2 = (await C2.deploy(contract.address)) as LogicMock
         await contract2.deployed()
 
         await contract.setLogic(contract2.address)
@@ -51,8 +52,9 @@ describe("testing for ", async () => {
             const assets = [wethAddr]
             const amounts = [utils.parseEther("0.1")]
             const modes = [0]
+            const params = encodeParameters(["uint256", "string"], [123, "fuga"])
 
-            await contract.myFlashLoanCall(assets, amounts, modes)
+            await contract.myFlashLoanCall(assets, amounts, modes, params)
             console.log((await weth.balanceOf(contract.address)).toString())
         })
     })

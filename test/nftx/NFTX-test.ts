@@ -30,7 +30,7 @@ describe("testing for ", async () => {
         nft = (await ethers.getContractAt("IERC721", galNft))        
     })
 
-    describe("myFlashLoanCall", async() => {
+    describe("NFTX-test", async() => {
         it("success", async () => {
 
             const vaultId = 438
@@ -42,6 +42,23 @@ describe("testing for ", async () => {
             await contract.buyAndRedeem(vaultId, amount, specificIds, path, to, {value: utils.parseEther("0.3")})
             console.log((await nft.balanceOf(owner.address)).toString())
         })
+
+        it("success weth", async () => {
+            const val = utils.parseEther("0.3")
+            await weth.deposit({value: val})
+            await weth.approve(contract.address, val)
+
+            const vaultId = 438
+            const amount = 1
+            const specificIds: any[] = []
+            const path = [wethAddr, galFt]
+            const to = owner.address
+
+            await contract.buyAndRedeemWETH(vaultId, amount, specificIds, val, path, to)
+            console.log((await nft.balanceOf(owner.address)).toString())
+        })
+
+        
     })
 
 })
