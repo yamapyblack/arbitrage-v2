@@ -23,8 +23,9 @@ const config: HardhatUserConfig = {
             // url: `https://kovan.infura.io/v3/${process.env.INFURA_KEY}`,
             //url: `https://bsc-dataseed1.binance.org:443`,
             //url: `https://rpc-mainnet.matic.network`,
-            blockNumber: 15010000,
-            url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+            // blockNumber: 15010000,
+            // url: `https://eth-mainnet.alchemyapi.io/v2/${process.env.ALCHEMY_KEY}`,
+            url: `https://optimism-mainnet.infura.io/v3/${process.env.INFURA_KEY2}`,            
         }
     },
     kovan: {
