@@ -2,8 +2,7 @@
 pragma solidity 0.8.15;
 pragma experimental ABIEncoderV2;
 
-import { IERC20 } from "./Interfaces.sol";
-
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 library Address {
   /**
